@@ -30,6 +30,8 @@ plugins:
 provider:
   name: aws
   runtime: python3.8
+  stage: prod
+  region: ap-southeast-2
 
 # you can overwrite defaults here
 #  stage: dev
@@ -55,6 +57,23 @@ provider:
 #  environment:
 #    variable1: value1
 
+environment:
+  tableName: &tableName notes_project
+
+
+iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:DescribeTable
+      - dynamodb:Query
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+      - dynamodb:DeleteItem
+    Resource: "arn:aws:dynamodb:ap-southeast-2:*:*"
+
+
 # you can add packaging information here
 #package:
 #  include:
@@ -65,8 +84,58 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
+  create:
+    handler: create.lambda_handler
+    environment:
+      tableName: *tableName
+    events:
+      - http:
+          path: notes
+          method: post
+          cors: true
+          authorizer: aws_iam
+  get:
+    handler: get.lambda_handler
+    environment:
+      tableName: *tableName
+    events:
+      - http:
+          path: notes/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+  list:
+    handler: list.lambda_handler
+    environment:
+      tableName: *tableName
+    events:
+      - http:
+          path: notes
+          method: get
+          cors: true
+          authorizer: aws_iam
+  update:
+    handler: update.lambda_handler
+    environment:
+      tableName: *tableName
+    events:
+      - http:
+          path: notes/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
+  delete:
+    handler: delete.lambda_handler
+    environment:
+      tableName: *tableName
+    events:
+      - http:
+          path: notes/{id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
+
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -114,6 +183,11 @@ functions:
 #      Type: AWS::S3::Bucket
 #      Properties:
 #        BucketName: my-new-bucket
+
+resources:
+# API Gateway Errors
+- ${file(resources/api-gateway-errors.yml)}
+
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"
