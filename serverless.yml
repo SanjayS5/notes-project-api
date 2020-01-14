@@ -33,6 +33,22 @@ provider:
   stage: prod
   region: ap-southeast-2
 
+  environment:
+  tableName: &tableName notes_project
+
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:ap-southeast-2:*:*"
+
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -57,21 +73,7 @@ provider:
 #  environment:
 #    variable1: value1
 
-environment:
-  tableName: &tableName notes_project
 
-
-iamRoleStatements:
-  - Effect: Allow
-    Action:
-      - dynamodb:DescribeTable
-      - dynamodb:Query
-      - dynamodb:Scan
-      - dynamodb:GetItem
-      - dynamodb:PutItem
-      - dynamodb:UpdateItem
-      - dynamodb:DeleteItem
-    Resource: "arn:aws:dynamodb:ap-southeast-2:*:*"
 
 
 # you can add packaging information here
