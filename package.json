@@ -19,6 +19,6 @@
   "homepage": "https://github.com/SanjayS5/notes-project-api#readme",
   "devDependencies": {
     "serverless-dotenv-plugin": "^2.1.1",
-    "serverless-offline": "^5.12.1"
+    "serverless-offline": "^12.0.4"
   }
 }
